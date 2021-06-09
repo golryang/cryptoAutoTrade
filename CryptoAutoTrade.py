@@ -40,7 +40,7 @@ ban = ["KRW-BTC",
 coinlist=[item for item in coinlist if item not in ban]
 #이름이 같으면 같은타입의 새로운 변수 생성
 
-#print(len(coinlist))
+print(len(coinlist))
 
 access = ""
 secret = ""
@@ -54,7 +54,7 @@ while True:
             list.pop(head)
     #만약 29 | 29 라면 -> head=(head+1)%listMaxLength head 초기화. 아래 참조 
         list.insert(head,pyupbit.get_current_price(coinlist))
-        if len(list)==listMaxLength: # 리스트가 30 개 찼을때.
+        if len(list)==listMaxLength: #리스트가 다 찼을 때
             tail=(head+1) % listMaxLength  
             topPrice = 0
             for coinname in coinlist: 
@@ -64,7 +64,7 @@ while True:
                 #print(i," ",headPrice," ",headPrice-tailPrice," ",tailPrice/100*5," ")
                 arbitrage=headPrice-tailPrice
                 #익절퍼센트 -> 이율, 아래 조건문 * > * 이상 올라가면 매수.
-                if arbitrage > tailPrice/100 * 3:
+                if arbitrage > tailPrice/100 * 3.5:
                     if arbitrage>topPrice:
                         topPrice=arbitrage
                         targetcoin=coinname
@@ -108,7 +108,7 @@ while True:
                 #upbit.sell_limit_order(coinname, calc, ordered_coin_balance)
                 """
 
-        #print("head",head," tail",tail," len",len(list))
+        print("head",head," tail",tail," len",len(list))
         head=(head+1)%listMaxLength
         if(buy == False):
             for i in range(1,19):
@@ -121,16 +121,16 @@ while True:
         if purchaseprice == None:
             break
 
-        # 5퍼 이상일때 매도
-        if purchaseprice - price > price/100 * 5:
+        # N퍼 이상일때 매도
+        if purchaseprice - price > price/100 * 4:
             upbit.sell_market_order(targetcoin, ordered_coin_balance)
             ordered_coin_balance = 0
             sell=True
             buy=False
             break
 
-        # -2퍼 이하 매도
-        if price - purchaseprice > price/100 * 3:
+        # -N퍼 이하 매도
+        if price - purchaseprice > price/100 * 4:
             upbit.sell_market_order(targetcoin, ordered_coin_balance)
             ordered_coin_balance = 0
             """
@@ -145,11 +145,12 @@ while True:
             buy=False
             break
         
-        #sell_loop가 20분동안 돌고 있으면.
-        if(sell_loop_count == 6000):
+        #sell_loop가 15분동안 돌고 있으면.
+        if(sell_loop_count == 900):
             upbit.sell_market_order(targetcoin, ordered_coin_balance)
             ordered_coin_balance = 0
+            sell_loop_count = 0
             sell=True
             buy=False
             break
-        time.sleep(0.2)
+        time.sleep(1)
