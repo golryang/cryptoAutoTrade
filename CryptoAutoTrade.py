@@ -64,7 +64,7 @@ while True:
                 #print(i," ",headPrice," ",headPrice-tailPrice," ",tailPrice/100*5," ")
                 arbitrage=headPrice-tailPrice
                 #익절퍼센트 -> 이율, 아래 조건문 * > * 이상 올라가면 매수.
-                if arbitrage > tailPrice/100 * 3:
+                if arbitrage > tailPrice/100 * 2.8:
                     if arbitrage>topPrice:
                         topPrice=arbitrage
                         targetcoin=coinname
@@ -119,21 +119,29 @@ while True:
         sell_loop_count += 1
         purchaseprice = pyupbit.get_current_price(targetcoin)
         if purchaseprice == None:
+            upbit.sell_market_order(targetcoin, ordered_coin_balance)
+            ordered_coin_balance = 0
+            sell_loop_count = 0
+            sell=True
+            buy=False
+            list=[]
             break
 
         # N퍼 이상일때 매도
-        if purchaseprice - price > price/100 * 2:
+        if purchaseprice - price > price/100 * 2.1:
             upbit.sell_market_order(targetcoin, ordered_coin_balance)
             ordered_coin_balance = 0
+            sell_loop_count = 0
             sell=True
             buy=False
             list=[]
             break
 
         # -N퍼 이하 매도
-        if price - purchaseprice > price/100 * 2:
+        if price - purchaseprice > price/100 * 2.1:
             upbit.sell_market_order(targetcoin, ordered_coin_balance)
             ordered_coin_balance = 0
+            sell_loop_count = 0
             """
             for i in upbit.get_order(targetcoin):
             # i === targetCoin의 거래내역 -> 가격
@@ -148,7 +156,7 @@ while True:
             break
         
         #sell_loop가 10분동안 돌고 있으면.
-        if(sell_loop_count == 600):
+        if(sell_loop_count >= 600):
             upbit.sell_market_order(targetcoin, ordered_coin_balance)
             ordered_coin_balance = 0
             sell_loop_count = 0
