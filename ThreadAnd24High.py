@@ -58,6 +58,7 @@ class Seller(TH.Thread):
     def run(self):
         global upbit
         global sellThreadCount
+        global orderedList
         while(True):            
             self.sell_loop_count+=1
             if self.currentPrice == None:
@@ -65,16 +66,22 @@ class Seller(TH.Thread):
             # N퍼 이상일때 매도
             if self.currentPrice - self.orderedPrice > self.orderedPrice/100 * 5:
                 upbit.sell_market_order(self.coinName, self.orderedVolume)
+                orderedList[coinname].remove(refresh)
+                list = []
                 sellThreadCount-=1
                 break
             # -N퍼 이하 매도
             if self.orderedPrice - self.currentPrice > self.orderedPrice/100 * 5:
                 upbit.sell_market_order(self.coinName, self.orderedVolume)
                 sellThreadCount-=1
+                orderedList[coinname].remove(refresh)
+                list = []
                 break
             if(self.sell_loop_count == 900):
                 upbit.sell_market_order(self.coinName, self.orderedVolume)
                 sellThreadCount-=1
+                orderedList[coinname].remove(refresh)
+                list = []
                 break
             time.sleep(0.2)
     
