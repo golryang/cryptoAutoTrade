@@ -22,15 +22,14 @@ maxOrder = 2
 targetcoin = ''
 isTimerOn = True
 
-buy3Min = False
 buy = False
 price=0
 def threeMinTimer():
     global buy3Min
     global isTimerOn
     while(isTimerOn):
-        for i in range(1,2):
-            time.sleep(0.15)
+        for i in range(1,7):
+            time.sleep(10)
         buy3Min = True
 
 def reFreshPriceList(coinName):
@@ -64,14 +63,14 @@ class Seller(TH.Thread):
             if self.currentPrice == None:
                 break
             # N퍼 이상일때 매도
-            if self.currentPrice - self.orderedPrice > self.orderedPrice/100 * 5:
+            if self.currentPrice - self.orderedPrice > self.orderedPrice/100 * 2:
                 upbit.sell_market_order(self.coinName, self.orderedVolume)
                 orderedList[coinname].remove(refresh)
                 list = []
                 sellThreadCount-=1
                 break
             # -N퍼 이하 매도
-            if self.orderedPrice - self.currentPrice > self.orderedPrice/100 * 5:
+            if self.orderedPrice - self.currentPrice > self.orderedPrice/100 * 2.5:
                 upbit.sell_market_order(self.coinName, self.orderedVolume)
                 sellThreadCount-=1
                 orderedList[coinname].remove(refresh)
@@ -140,7 +139,7 @@ try:
                         targetcoin=coinname
                     buy=True
             #print(maxOrder > sellThreadCount, "|", maxOrder, "|", sellThreadCount)
-            if buy and buy3Min and (maxOrder > sellThreadCount) :
+            if buy and (maxOrder > sellThreadCount) :
                 order = upbit.buy_market_order(targetcoin, 30000)
                 orderREQ = upbit.get_order(order['uuid'],state="done")
                 time.sleep(0.05)
@@ -157,7 +156,6 @@ try:
                 seller.start()
                 orderedList[targetcoin].append(seller.refresh)
                 buy = False
-                buy3Min = False
                 #print(price)
                 """
                 count = price/100 * 익절퍼센트
@@ -183,7 +181,8 @@ try:
     
         print("head",head," tail",tail," len",len(list))
         head=(head+1)%listMaxLength
-        time.sleep(0.2)
+        for i in range(1,7):
+            time.sleep(10)
 except KeyboardInterrupt or Exception:
     isTimerOn = False
         
