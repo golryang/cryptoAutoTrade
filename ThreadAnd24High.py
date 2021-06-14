@@ -139,8 +139,8 @@ try:
                         targetcoin=coinname
                     buy=True
             #print(maxOrder > sellThreadCount, "|", maxOrder, "|", sellThreadCount)
-            if buy and (maxOrder > sellThreadCount) :
-                order = upbit.buy_market_order(targetcoin, 30000)
+            if buy and buy3Min and (maxOrder > sellThreadCount) :
+                order = upbit.buy_market_order(targetcoin, 15000)
                 orderREQ = upbit.get_order(order['uuid'],state="done")
                 time.sleep(0.05)
                 while(orderREQ['trades_count'] == 0):
@@ -156,6 +156,7 @@ try:
                 seller.start()
                 orderedList[targetcoin].append(seller.refresh)
                 buy = False
+                buy3Min = False
                 #print(price)
                 """
                 count = price/100 * 익절퍼센트
